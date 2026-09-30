@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="文献检索平台 - 全球硕博论文 + 学术文献检索，支持知网/万方/万方医学/维普一键跳转，电脑与手机通用">
+<title>文献检索平台 · 全球硕博论文 + 学术文献</title>
+<style>
+/* ============ 基础 ============ */
+:root{
+  --bg:#f4f6fb; --card:#ffffff; --text:#1c2333; --muted:#667085; --line:#e3e8f0;
+  --primary:#2563eb; --primary-dark:#1e4fc2; --primary-soft:#e8effc;
+  --accent:#0ea5e9; --danger:#dc2626; --ok:#16a34a; --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.05);
+  --radius:12px; --radius-s:8px;
+  --header-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--primary);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit}
+::selection{background:var(--primary-soft)}
+
+/* ============ 顶部栏 ============ */
+.topbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);height:var(--header-h);display:flex;align-items:center;padding:0 18px;gap:14px;max-width:100%;min-width:0}
+.brand{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:700;color:var(--text);white-space:nowrap;min-width:0;overflow:hidden}
+.brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;flex-shrink:0}
+.brand small{display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.4px;margin-top:-2px}
+.topbar .spacer{flex:1}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:7px;border-radius:8px;position:relative;line-height:1}
+.icon-btn:hover{background:#f2f5fa;color:var(--primary)}
+.icon-btn .badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;font-weight:600}
+
+/* ============ 搜索区 ============ */
+.search-shell{background:linear-gradient(180deg,#eef3fc 0%,var(--bg) 100%);padding:22px 18px 16px}
+.search-box{max-width:920px;margin:0 auto}
+.search-bar{display:flex;gap:8px;flex-wrap:wrap}
+.search-input-wrap{flex:1 1 360px;position:relative;display:flex}
+.field-select{padding:0 8px;border:1.5px solid var(--line);border-right:none;border-radius:var(--radius) 0 0 var(--radius);background:#f8fafc;font-size:13.5px;color:#344054;cursor:pointer;min-width:86px;max-width:110px}
+.search-input-wrap input{width:100%;padding:12px 44px 12px 14px;border:1.5px solid var(--line);border-radius:0 var(--radius) var(--radius) 0;font-size:15px;background:#fff;transition:border-color .15s, box-shadow .15s;color:var(--text)}
+.search-input-wrap input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+.search-input-wrap .clear-x{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px;display:none}
+.search-bar .btn-search{padding:12px 26px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.search-bar .btn-search:hover{background:var(--primary-dark)}
+.filters{max-width:920px;margin:10px auto 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}
+.filters select,.filters input[type=number]{padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-s);background:#fff;font-size:13.5px;color:var(--text);min-width:0;flex-shrink:0}
+.filters select:focus,.filters input[type=number]:focus{outline:none;border-color:var(--primary)}
+.filters label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:5px;min-width:0;flex-shrink:0}
+.filters .range{display:flex;align-items:center;gap:6px}
+.filters .range input{width:82px}
+.search-meta{max-width:920px;margin:8px auto 0;font-size:12.5px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.search-meta .spacer{flex:1}
+/* 中文数据库直达 */
+.cn-databases{max-width:920px;margin:10px auto 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fff;border:1px dashed #cdd8ec;border-radius:var(--radius);padding:10px 14px}
+.cn-label{font-size:13px;color:#344054;font-weight:600;margin-right:2px}
+.cn-btn{border:none;padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;color:#fff;transition:transform .12s, opacity .12s;flex-shrink:0}
+.cn-btn:hover{transform:translateY(-1px);opacity:.9}
+.cn-btn:active{transform:scale(.96)}
+.cn-cnki{background:#c7254e}
+.cn-wanfang{background:#1677ff}
+.cn-med{background:#00b96b}
+.cn-vip{background:#fa8c16}
+.cn-note{font-size:11.5px;color:var(--muted)}
+
+/* ============ 布局 ============ */
+.layout{max-width:1280px;margin:0 auto;padding:18px;display:grid;grid-template-columns:210px minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:start;min-width:0}
+.layout > *{min-width:0}
+@media (max-width:1100px){.layout{grid-template-columns:190px minmax(0,1fr)} .detail-panel{grid-column:1/-1;position:static;margin-top:2px}}
+@media (max-width:900px){.layout{grid-template-columns:1fr} .facets-panel{position:static;order:-1}}
+
+/* ============ 结果列表 ============ */
+.result-list{display:flex;flex-direction:column;gap:10px;min-width:0}
+.paper-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:box-shadow .15s, border-color .15s;position:relative;min-width:0}
+.paper-card:hover{border-color:#c9d6ea;box-shadow:0 4px 12px rgba(16,24,40,.08)}
+.paper-card.active{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-soft)}
+.paper-card .type-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--primary-soft);color:var(--primary);font-weight:600;margin-bottom:6px}
+.paper-card .src-oa{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#f0fdf4;color:#15803d;font-weight:600;margin-bottom:6px;margin-right:5px}
+.paper-card .src-cr{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:#fef9c3;color:#854d0e;font-weight:600;margin-bottom:6px;margin-right:5px}
+.paper-card .degree-tag{background:#eef2ff;padding:2px 8px;border-radius:6px;font-weight:600;color:#4338ca}
+.paper-card .vol-iss{background:#f8fafc;padding:2px 8px;border-radius:6px;font-weight:600;color:#475467}
+.paper-card .pages{background:#f8fafc;padding:2px 8px;border-radius:6px;font-weight:600;color:#475467}
+.paper-card h3{font-size:15.5px;font-weight:600;line-height:1.45;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.paper-card .authors{font-size:13px;color:var(--muted);margin-top:5px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.paper-card .meta-row{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.paper-card .year{background:#f2f5fa;padding:2px 8px;border-radius:6px;font-weight:600;color:#344054}
+.paper-card .journal{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.paper-card .fav{position:absolute;top:10px;right:10px;border:none;background:none;font-size:16px;cursor:pointer;color:#c6ceda;padding:4px;line-height:1}
+.paper-card .fav.on{color:#f59e0b}
+.paper-card .fav:hover{transform:scale(1.15)}
+
+/* 骨架屏 */
+.skeleton{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.skeleton .sk{height:14px;border-radius:6px;background:linear-gradient(90deg,#eef1f6 25%,#f7f9fc 50%,#eef1f6 75%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton .sk.t{height:16px;width:80%}
+.skeleton .sk.s{margin-top:8px;width:55%}
+.skeleton .sk.m{margin-top:12px;width:35%;height:12px}
+
+/* ============ 详情面板 ============ */
+.detail-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;position:sticky;top:calc(var(--header-h) + 14px);min-height:260px;min-width:0}
+@media (max-width:900px){.detail-panel{position:static;margin-top:2px}}
+.detail-panel .placeholder{color:var(--muted);text-align:center;padding:46px 16px}
+.detail-panel .placeholder .big{font-size:40px;margin-bottom:10px}
+.detail-panel .d-type{display:inline-block;font-size:11px;padding:2px 10px;border-radius:20px;background:var(--primary-soft);color:var(--primary);font-weight:600}
+.detail-panel .d-src{display:inline-block;font-size:11px;padding:2px 10px;border-radius:20px;background:#f0fdf4;color:#15803d;font-weight:600;margin-left:6px}
+.detail-panel .d-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.detail-panel .d-year{display:inline-block;font-size:13px;background:#f2f5fa;padding:3px 10px;border-radius:6px;color:#344054;font-weight:600}
+.detail-panel .d-degree{display:inline-block;font-size:13px;background:#eef2ff;padding:3px 10px;border-radius:6px;color:#4338ca;font-weight:600}
+.detail-panel .d-vol{display:inline-block;font-size:13px;background:#f8fafc;padding:3px 10px;border-radius:6px;color:#475467;font-weight:600}
+.detail-panel .d-pages{display:inline-block;font-size:13px;background:#f8fafc;padding:3px 10px;border-radius:6px;color:#475467;font-weight:600}
+.detail-panel .d-lang{display:inline-block;font-size:13px;background:#f0fdf4;padding:3px 10px;border-radius:6px;color:#15803d;font-weight:600}
+.detail-panel h2{font-size:19px;font-weight:700;line-height:1.45;margin-top:10px}
+.detail-panel .d-authors{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.7}
+.detail-panel .d-journal{font-size:13.5px;color:var(--muted);margin-top:8px}
+.detail-panel .d-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-dark)}
+.btn.danger{border-color:#f3c1c1;color:var(--danger)}
+.detail-panel .d-abstract{font-size:14px;color:#3d4556;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.detail-panel .d-doi{font-size:12.5px;color:var(--muted);margin-top:12px;word-break:break-all}
+.detail-panel .d-keywords{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.detail-panel .kw{font-size:12px;background:#f2f5fa;color:#475467;padding:3px 10px;border-radius:20px}
+
+/* ============ 收藏抽屉 ============ */
+.drawer-mask{position:fixed;inset:0;background:rgba(16,24,40,.45);z-index:100;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
+.drawer-mask.show{opacity:1;visibility:visible}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:#fff;z-index:101;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(16,24,40,.12)}
+.drawer.show{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line);gap:10px}
+.drawer-head h3{font-size:16px;flex:1}
+.drawer-head .cnt{font-size:12px;color:var(--muted);font-weight:400}
+.drawer-body{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.drawer-body .empty{color:var(--muted);text-align:center;padding:40px 10px;font-size:14px}
+.fav-item{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;background:#fbfcfe}
+.fav-item .info{flex:1;min-width:0}
+.fav-item h4{font-size:14px;font-weight:600;line-height:1.45;cursor:pointer;color:var(--text)}
+.fav-item h4:hover{color:var(--primary)}
+.fav-item .sub{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-item .rm{border:none;background:none;color:#c6ceda;cursor:pointer;font-size:14px;padding:4px;line-height:1}
+.fav-item .rm:hover{color:var(--danger)}
+.drawer-foot{padding:14px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+.drawer-foot .btn{flex:1;justify-content:center}
+
+/* ============ 分页 ============ */
+.pagination{display:flex;justify-content:center;align-items:center;gap:14px;padding:6px 0 8px;flex-wrap:wrap}
+.pagination .btn{padding:7px 16px}
+.pagination .info{font-size:12.5px;color:var(--muted)}
+
+/* ============ Toast ============ */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);background:#1c2333;color:#fff;padding:10px 18px;border-radius:10px;font-size:13.5px;z-index:200;opacity:0;transition:all .3s;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:86vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ============ 空状态/错误 ============ */
+.state-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:42px 20px;text-align:center;color:var(--muted)}
+.state-box .big{font-size:36px;margin-bottom:10px}
+.state-box h4{font-size:16px;color:var(--text);margin-bottom:6px}
+
+/* ============ 门户导航 ============ */
+.nav-bar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:var(--header-h);z-index:49;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;width:100%}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;gap:2px;padding:0 14px;min-width:max-content}
+.nav-item{padding:12px 16px;font-size:14px;font-weight:500;color:#475467;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;transition:color .15s}
+.nav-item:hover{color:var(--primary)}
+.nav-item.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.nav-item .nav-ico{margin-right:5px}
+/* ============ 学科导航 ============ */
+.field-nav{max-width:1280px;margin:0 auto;padding:10px 18px 0;display:flex;align-items:center;gap:10px}
+.field-nav-label{font-size:13px;font-weight:600;color:var(--primary);white-space:nowrap;flex-shrink:0}
+.field-nav-list{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}
+.field-item{border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:20px;font-size:12px;color:#475467;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.field-item:hover{border-color:var(--primary);color:var(--primary)}
+.field-item.active{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:600}
+@media (max-width:600px){
+  .nav-bar{top:var(--header-h)}
+  .nav-item{padding:11px 12px;font-size:13px}
+}
+/* ============ 高级检索 ============ */
+.adv-toggle{max-width:920px;margin:8px auto 0;text-align:right}
+.adv-toggle button{background:none;border:none;color:var(--primary);font-size:12.5px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.adv-toggle button:hover{background:var(--primary-soft)}
+.adv-panel{max-width:920px;margin:8px auto 0;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:none}
+.adv-panel.show{display:block}
+.adv-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.adv-row:last-child{margin-bottom:0}
+.adv-row select{padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-s);background:#fff;font-size:13px;color:var(--text);min-width:0}
+.adv-row input{padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius-s);font-size:13px;color:var(--text);flex:1;min-width:160px}
+.adv-row input:focus{outline:none;border-color:var(--primary)}
+.adv-logic{color:var(--muted);font-size:12px;font-weight:600}
+.adv-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px;padding:6px;border-radius:6px}
+.adv-del:hover{background:#fef2f2}
+.adv-add{background:none;border:1px dashed var(--line);color:var(--primary);cursor:pointer;font-size:12.5px;padding:7px 14px;border-radius:var(--radius-s);width:100%}
+.adv-add:hover{border-color:var(--primary);background:var(--primary-soft)}
+/* ============ 分面筛选 ============ */
+.facets-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;position:sticky;top:calc(var(--header-h) + 60px)}
+.facet-group{margin-bottom:14px}
+.facet-group:last-child{margin-bottom:0}
+.facet-title{font-size:13px;font-weight:600;color:#344054;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.facet-list{display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto}
+.facet-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#475467;cursor:pointer;padding:4px 6px;border-radius:6px}
+.facet-item:hover{background:#f5f7fb}
+.facet-item input{margin:0;accent-color:var(--primary)}
+.facet-item .f-count{color:var(--muted);font-size:11px;margin-left:auto}
+.facet-item.on{color:var(--primary);font-weight:600}
+.facet-clear{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;margin-left:auto}
+.facet-clear:hover{color:var(--danger)}
+.facet-year{display:flex;flex-direction:column;gap:4px}
+.facet-year input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:12px}
+/* ============ 批量选择 ============ */
+.batch-bar{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:8px 14px;margin-bottom:10px;font-size:13px;color:#344054;flex-wrap:wrap}
+.batch-bar .sel-all{display:flex;align-items:center;gap:6px;cursor:pointer}
+.batch-bar .sel-all input{accent-color:var(--primary)}
+.batch-bar .spacer{flex:1}
+.batch-bar .btn{padding:6px 12px;font-size:12.5px}
+.paper-card.selected{border-color:var(--primary);background:#f5f8ff}
+.paper-card .sel-check{position:absolute;top:10px;left:10px;width:16px;height:16px;accent-color:var(--primary);cursor:pointer;z-index:2}
+.paper-card{padding-left:34px}
+/* ============ 引用格式导出 ============ */
+.cite-pop{position:fixed;inset:0;background:rgba(16,24,40,.5);z-index:150;display:none;align-items:center;justify-content:center;padding:20px}
+.cite-pop.show{display:flex}
+.cite-box{background:#fff;border-radius:var(--radius);max-width:640px;width:100%;max-height:80vh;display:flex;flex-direction:column}
+.cite-head{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.cite-head h3{font-size:15px;flex:1}
+.cite-body{flex:1;overflow-y:auto;padding:16px 18px}
+.cite-format{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.cite-fmt-btn{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:20px;font-size:12.5px;cursor:pointer;color:#475467}
+.cite-fmt-btn.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.cite-text{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12.5px;font-family:Consolas,Menlo,monospace;white-space:pre-wrap;word-break:break-all;line-height:1.7;max-height:320px;overflow-y:auto}
+.cite-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+
+/* 打印 */
+@media print{ .topbar,.search-shell,.pagination,.detail-panel .d-actions,.drawer{display:none!important} body{background:#fff} .layout{max-width:100%;padding:0} .paper-card{border:none;border-bottom:1px solid var(--line);border-radius:0;cursor:default} }
+
+/* ============ 移动端优化 ============ */
+@media (max-width:600px){
+  :root{--header-h:56px}
+  .topbar{padding:0 12px;gap:10px}
+  .brand{font-size:16px}
+  .search-shell{padding:16px 12px}
+  .search-box{min-width:0}
+  .search-bar .btn-search{padding:12px 18px}
+  .filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;-webkit-overflow-scrolling:touch;max-width:100%}
+  .filters select,.filters input[type=number]{white-space:nowrap}
+  .layout{padding:12px;gap:12px;min-width:0}
+  .layout > *{min-width:0}
+  .result-list,.detail-panel{min-width:0}
+  .detail-panel{padding:16px}
+  .detail-panel h2{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">📚</div>
+    <div>
+      文献检索平台
+      <small>LITERATURE SEARCH · POWERED BY CROSSREF</small>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="btnFav" title="我的收藏" aria-label="我的收藏">⭐<span class="badge" id="favBadge" style="display:none">0</span></button>
+  <button class="icon-btn" id="btnAbout" title="关于" aria-label="关于">ℹ️</button>
+</header>
+
+<!-- 门户资源导航 -->
+<nav class="nav-bar" aria-label="资源导航">
+  <div class="nav-inner">
+    <button class="nav-item active" data-nav="literature"><span class="nav-ico">📄</span>学术文献</button>
+    <button class="nav-item" data-nav="dissertations"><span class="nav-ico">🎓</span>硕博论文</button>
+    <button class="nav-item" data-nav="journal"><span class="nav-ico">📰</span>期刊</button>
+    <button class="nav-item" data-nav="book"><span class="nav-ico">📚</span>图书</button>
+    <button class="nav-item" data-nav="conference"><span class="nav-ico">🗣</span>会议论文</button>
+    <button class="nav-item" data-nav="dataset"><span class="nav-ico">💾</span>数据集</button>
+    <button class="nav-item" data-nav="preprint"><span class="nav-ico">🚀</span>预印本</button>
+  </div>
+</nav>
+
+<!-- 学科导航（国际学科设置，对标 Scopus 学科体系） -->
+<div class="field-nav" id="fieldNav" aria-label="学科导航">
+  <span class="field-nav-label">🧭 学科导航</span>
+  <div class="field-nav-list" id="fieldNavList">
+    <button class="field-item active" data-field="">🌐 全部学科</button>
+    <button class="field-item" data-field="27">🏥 医学 Medicine</button>
+    <button class="field-item" data-field="17">💻 计算机科学 Computer Science</button>
+    <button class="field-item" data-field="22">⚙ 工程 Engineering</button>
+    <button class="field-item" data-field="12">🎨 人文艺术 Arts &amp; Humanities</button>
+    <button class="field-item" data-field="33">🌍 社会科学 Social Sciences</button>
+    <button class="field-item" data-field="31">🔭 物理学 Astronomy</button>
+    <button class="field-item" data-field="16">🧪 化学 Chemistry</button>
+    <button class="field-item" data-field="26">📐 数学 Mathematics</button>
+    <button class="field-item" data-field="25">🧱 材料科学 Materials Science</button>
+    <button class="field-item" data-field="13">🧬 生物化学分子生物 Biochemistry</button>
+    <button class="field-item" data-field="11">🌾 农业生物科学 Agricultural &amp; Bio</button>
+    <button class="field-item" data-field="23">🌱 环境科学 Environmental Science</button>
+    <button class="field-item" data-field="20">💰 经济计量金融 Economics</button>
+    <button class="field-item" data-field="14">📊 工商管理会计 Business &amp; Mgmt</button>
+    <button class="field-item" data-field="32">🧠 心理学 Psychology</button>
+    <button class="field-item" data-field="36">🩺 健康职业 Health Professions</button>
+    <button class="field-item" data-field="19">🌏 地球行星科学 Earth &amp; Planetary</button>
+    <button class="field-item" data-field="28">🧠 神经科学 Neuroscience</button>
+    <button class="field-item" data-field="18">📈 决策科学 Decision Sciences</button>
+    <button class="field-item" data-field="24">🦠 免疫微生物 Immunology &amp; Microbio</button>
+    <button class="field-item" data-field="21">⚡ 能源 Energy</button>
+    <button class="field-item" data-field="29">🏥 护理学 Nursing</button>
+    <button class="field-item" data-field="30">💊 药理学毒理 Pharmaco &amp; Toxic</button>
+    <button class="field-item" data-field="35">🦷 牙科学 Dentistry</button>
+    <button class="field-item" data-field="15">🧪 化学工程 Chemical Engineering</button>
+    <button class="field-item" data-field="34">🐾 兽医学 Veterinary</button>
+  </div>
+</div>
+
+<!-- 搜索区 -->
+<section class="search-shell">
+  <div class="search-box">
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <select id="fField" class="field-select" aria-label="检索字段">
+          <option value="all">全部字段</option>
+          <option value="title">标题</option>
+          <option value="author">作者</option>
+          <option value="doi">DOI</option>
+          <option value="publisher">期刊/出版社</option>
+        </select>
+        <input type="text" id="q" name="" placeholder="输入关键词 / 标题 / 作者 / DOI / 期刊名…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" enterkeyhint="search">
+        <button class="clear-x" id="clearX" aria-label="清空">✕</button>
+      </div>
+      <button class="btn-search" id="btnSearch">🔍 检索</button>
+    </div>
+    <div class="filters">
+      <label>数据源
+        <select id="fSource">
+          <option value="literature" selected>学术文献（稳定）</option>
+          <option value="all">全部（硕博论文+文献）</option>
+          <option value="dissertations">全球硕博论文</option>
+        </select>
+      </label>
+      <label>学位类型
+        <select id="fDegree">
+          <option value="">不限学位</option>
+          <option value="doctoral">博士论文</option>
+          <option value="masters">硕士论文</option>
+          <option value="bachelors">本科论文</option>
+        </select>
+      </label>
+      <div class="range">
+        <input type="number" id="fYearFrom" placeholder="起始年" min="1500" max="2100">
+        <span>–</span>
+        <input type="number" id="fYearTo" placeholder="结束年" min="1500" max="2100">
+      </div>
+      <label>出版社地区
+        <select id="fRegion">
+          <option value="">全部地区</option>
+          <option value="western">欧美</option>
+          <option value="japan">日本</option>
+          <option value="korea">韩国</option>
+          <option value="china">国内</option>
+        </select>
+      </label>
+      <label>排序
+        <select id="fSort">
+          <option value="relevance">相关度</option>
+          <option value="published">最新优先</option>
+          <option value="cited">被引最多</option>
+        </select>
+      </label>
+    </div>
+    <div class="adv-toggle">
+      <button id="btnAdvToggle">⚙ 高级检索</button>
+    </div>
+    <!-- 高级检索面板 -->
+    <div class="adv-panel" id="advPanel">
+      <div class="adv-row">
+        <select class="adv-field">
+          <option value="all">全部字段</option>
+          <option value="title">标题</option>
+          <option value="author">作者</option>
+          <option value="doi">DOI</option>
+          <option value="publisher">期刊/出版社</option>
+          <option value="abstract">摘要</option>
+        </select>
+        <input class="adv-val" type="text" placeholder="输入检索词…" value="">
+      </div>
+      <div class="adv-row">
+        <span class="adv-logic">AND</span>
+        <select class="adv-field">
+          <option value="all">全部字段</option>
+          <option value="title">标题</option>
+          <option value="author">作者</option>
+          <option value="doi">DOI</option>
+          <option value="publisher">期刊/出版社</option>
+          <option value="abstract">摘要</option>
+        </select>
+        <input class="adv-val" type="text" placeholder="输入检索词…" value="">
+        <button class="adv-del" title="删除条件">✕</button>
+      </div>
+      <div class="adv-row">
+        <button class="adv-add" id="btnAdvAdd">+ 添加检索条件</button>
+      </div>
+      <div class="adv-row">
+        <label>文献类型
+          <select id="advType">
+            <option value="">全部类型</option>
+            <option value="journal-article">期刊论文</option>
+            <option value="proceedings-article">会议论文</option>
+            <option value="book-chapter">图书章节</option>
+            <option value="book">图书</option>
+            <option value="dissertation">学位论文</option>
+            <option value="preprint">预印本</option>
+            <option value="dataset">数据集</option>
+            <option value="report">报告</option>
+          </select>
+        </label>
+        <label>语种
+          <select id="advLang">
+            <option value="">全部语种</option>
+            <option value="zh">中文</option>
+            <option value="en">英文</option>
+          </select>
+        </label>
+        <button class="btn primary" id="btnAdvSearch">🔍 执行检索</button>
+        <button class="btn" id="btnAdvReset">重置</button>
+      </div>
+    </div>
+    <div class="search-meta" id="searchMeta" style="display:none">
+      <span id="metaCount"></span>
+      <span id="metaTime"></span>
+      <span class="spacer"></span>
+      <span id="metaHint"></span>
+    </div>
+    <!-- 中文数据库一键检索 -->
+    <div class="cn-databases" id="cnDbs">
+      <span class="cn-label">📡 中文数据库直达（按当前关键词检索）：</span>
+      <button class="cn-btn cn-cnki" data-url="https://kns.cnki.net/kns8s/defaultresult/index?kw=KEYWORD">知网</button>
+      <button class="cn-btn cn-wanfang" data-url="https://s.wanfangdata.com.cn/paper?q=KEYWORD">万方</button>
+      <button class="cn-btn cn-med" data-url="https://med.wanfangdata.com.cn/Search/Index?q=KEYWORD">万方医学</button>
+      <button class="cn-btn cn-vip" data-url="https://qikan.cqvip.com/Qikan/Search/Index?key=KEYWORD">维普</button>
+      <span class="cn-note">需学校/机构账号权限，部分库登录后可下载全文</span>
+    </div>
+  </div>
+</section>
+
+<!-- 主区域：分面 + 结果 + 详情 -->
+<main class="layout">
+  <!-- 分面筛选 -->
+  <aside class="facets-panel" id="facetsPanel">
+    <div class="facet-group">
+      <div class="facet-title">📚 文献类型 <button class="facet-clear" id="facetTypeClear">清除</button></div>
+      <div class="facet-list" id="facetTypeList"></div>
+    </div>
+    <div class="facet-group">
+      <div class="facet-title">📰 期刊/来源 <button class="facet-clear" id="facetJournalClear">清除</button></div>
+      <div class="facet-list" id="facetJournalList"></div>
+    </div>
+    <div class="facet-group">
+      <div class="facet-title">📅 出版年份 <button class="facet-clear" id="facetYearClear">清除</button></div>
+      <div class="facet-year">
+        <input type="number" id="facetYearFrom" placeholder="起始年" min="1500" max="2100">
+        <input type="number" id="facetYearTo" placeholder="结束年" min="1500" max="2100">
+        <button class="btn" id="facetYearApply" style="margin-top:4px">应用年份</button>
+      </div>
+    </div>
+  </aside>
+  <!-- 结果列表 -->
+  <div>
+    <div class="batch-bar" id="batchBar" style="display:none">
+      <label class="sel-all"><input type="checkbox" id="selAll"> 全选本页</label>
+      <span id="selCount">已选 0 篇</span>
+      <span class="spacer"></span>
+      <button class="btn" id="btnBatchFav">⭐ 批量收藏</button>
+      <button class="btn" id="btnBatchBib">📤 导出选中</button>
+      <button class="btn" id="btnBatchCite">📋 引用格式</button>
+    </div>
+    <div class="result-list" id="resultList" aria-live="polite"></div>
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="btn" id="btnPrev">‹ 上一页</button>
+      <span class="info" id="pageInfo"></span>
+      <button class="btn" id="btnNext">下一页 ›</button>
+    </div>
+  </div>
+  <aside class="detail-panel" id="detailPanel"></aside>
+</main>
+
+<!-- 引用格式弹窗 -->
+<div class="cite-pop" id="citePop">
+  <div class="cite-box">
+    <div class="cite-head"><h3>📋 引用格式</h3><button class="icon-btn" id="citeClose">✕</button></div>
+    <div class="cite-body">
+      <div class="cite-format">
+        <button class="cite-fmt-btn on" data-fmt="gb">GB/T 7714</button>
+        <button class="cite-fmt-btn" data-fmt="apa">APA</button>
+        <button class="cite-fmt-btn" data-fmt="mla">MLA</button>
+        <button class="cite-fmt-btn" data-fmt="bibtex">BibTeX</button>
+      </div>
+      <div class="cite-text" id="citeText"></div>
+    </div>
+    <div class="cite-foot">
+      <button class="btn" id="citeCopy">📋 复制</button>
+      <button class="btn primary" id="citeClose2">关闭</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">数据来源：OpenAlex（全球硕博论文）· Crossref（学术文献）· 中文库直达需机构权限 · 检索结果版权归原作者/出版社所有</footer>
+
+<!-- 收藏抽屉 -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="我的收藏">
+  <div class="drawer-head">
+    <h3>⭐ 我的收藏 <span class="cnt" id="favCount"></span></h3>
+    <button class="icon-btn" id="btnCloseDrawer" aria-label="关闭">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <button class="btn" id="btnExportBib">导出 BibTeX</button>
+    <button class="btn" id="btnExportCsv">导出 CSV</button>
+    <button class="btn danger" id="btnClearFav">清空收藏</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ================= 配置 ================= */
+const CROSSREF_API = "https://api.crossref.org/works";
+const OPENALEX_API = "https://api.openalex.org/works";
+const UA = "LitSearch/1.0 (mailto:user@example.com)";
+const ROWS = 10;                 // 每页条数
+const MAX_PAGES = 40;            // 最多翻页数（保护性上限）
+// 学位类型通过标题特征前端分类（OpenAlex dissertation 无 degree_type 字段）
+const DEGREE_PATTERNS = {
+  doctoral:[/ph\.?d/i,/doctoral/i,/d\.?ph\.?d/i,/博士/],
+  masters:[/master['’]?s/i,/硕士/],
+  bachelors:[/bachelor/i,/undergraduate/i,/本科/]
+};
+const TYPE_LABEL = {             // 类型显示名
+  "journal-article":"期刊论文","proceedings-article":"会议论文","book-chapter":"书籍章节",
+  "book":"图书","monograph":"专著","report":"报告","dissertation":"学位论文",
+  "preprint":"预印本","dataset":"数据集","posted-content":"网络发布","reference-entry":"百科条目",
+  "peer-review":"同行评议","standard":"标准","other":"其他"
+};
+const SORT_MAP = { relevance:"relevance", published:"published", cited:"cited_by_count" };
+
+/* ================= 状态 ================= */
+let state = {
+  q:"", field:"all", source:"all", degree:"", yearFrom:"", yearTo:"", sort:"relevance",
+  cursor:"*", prevCursor:null, page:1, total:0,
+  results:[], active:null, loading:false, sourceTag:"all",
+  crCursor:"*", crPrev:null, oaFallback:false, langFilter:"", advConditions:[]   // Crossref 游标（翻页用）
+};
+let favorites = loadFav();
+
+/* ================= DOM ================= */
+const $ = id => document.getElementById(id);
+const resultList = $("resultList"), detailPanel = $("detailPanel"), pagination = $("pagination");
+const qInput = $("q"), clearX = $("clearX");
+
+/* ================= 收藏持久化 ================= */
+function loadFav(){
+  try{ return JSON.parse(localStorage.getItem("litsearch_fav")||"[]"); }
+  catch(e){ return []; }
+}
+function saveFav(){ localStorage.setItem("litsearch_fav", JSON.stringify(favorites)); }
+function isFav(doi){ return favorites.some(f=>f.doi===doi); }
+function addFav(item){ if(!isFav(item.doi)){ favorites.unshift(item); saveFav(); renderFavBadge(); renderDrawer(); toast("已收藏 ⭐"); } }
+function removeFav(doi){ favorites = favorites.filter(f=>f.doi!==doi); saveFav(); renderFavBadge(); renderDrawer(); toast("已取消收藏"); }
+
+/* ================= 工具函数 ================= */
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function stripTags(s){ if(!s) return ""; return String(s).replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g," ").trim(); }
+function fmtAuthors(list, max){
+  if(!list || !list.length) return "佚名";
+  const names = list.map(a=>[a.given,a.family].filter(Boolean).join(" "));
+  const lim = max || 6;
+  if(names.length<=lim) return names.join(", ");
+  return names.slice(0,lim).join(", ") + " 等 " + names.length + " 位作者";
+}
+function yearOf(issued){ if(!issued || !issued["date-parts"] || !issued["date-parts"][0]) return ""; return issued["date-parts"][0][0] || ""; }
+function typeLabel(t){ return TYPE_LABEL[t] || (t ? t.replace(/-/g," ") : "文献"); }
+function journalOf(item){
+  const c = item["container-title"];
+  if(c && c[0]) return c[0];
+  const p = item["publisher"];
+  return p || "";
+}
+function doiUrl(doi){ return "https://doi.org/" + encodeURIComponent(doi); }
+function doiOf(item){ return (item.DOI||"").replace(/^doi:/i,""); }
+function normDOI(d){ return String(d||"").trim().toLowerCase().replace(/^doi:\s*/i,""); }
+function abstractText(item){
+  let a = item.abstract || "";
+  if(!a) return "";
+  a = stripTags(a);
+  if(a.length > 900) a = a.slice(0,900) + " …";
+  return a;
+}
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+/* ================= 搜索 ================= */
+// ---- OpenAlex 摘要倒排索引还原 ----
+function rebuildAbstract(inverted){
+  if(!inverted) return "";
+  const pos = {};
+  for(const word in inverted){
+    for(const p of inverted[word]) pos[p] = word;
+  }
+  const words = [];
+  for(let i=0; i<Object.keys(pos).length; i++){
+    if(pos[i]) words.push(pos[i]);
+  }
+  return words.join(" ").replace(/\s+/g," ").trim();
+}
+// ---- 学位类型分类（标题特征）----
+function classifyDegree(title){
+  for(const deg of ["doctoral","masters","bachelors"]){
+    for(const re of DEGREE_PATTERNS[deg]){
+      if(re.test(title)) return deg;
+    }
+  }
+  return "";
+}
+// ---- OpenAlex 条目标准化 ----
+function normalizeOA(item){
+  const doi = (item.doi||"").replace("https://doi.org/","");
+  const authors = (item.authorships||[]).map(a=>({
+    given: a.author?.given_name||"", family: a.author?.display_name||""
+  }));
+  const inst = item.primary_location?.source?.display_name || "";
+  const lang = item.language || "";
+  const biblio = item.biblio || {};
+  return {
+    doi, title:item.title||"（无标题）", authors, issued:{"date-parts":[[item.publication_year]]},
+    type:item.type||"dissertation", journal:inst, publisher:item.primary_location?.source?.host_organization||"",
+    volume:biblio.volume||"", issue:biblio.issue||"", page:biblio.first_page?`${biblio.first_page}${biblio.last_page?"-"+biblio.last_page:""}`:"", articleNumber:"",
+    abstract:rebuildAbstract(item.abstract_inverted_index), url:item.doi||item.landing_page_url||"",
+    platform:item.landing_page_url || item.doi || "",
+    cited:item.cited_by_count||0, lang:lang,
+    degree:classifyDegree(item.title||""),
+    source:"openalex", oaId:item.id||""
+  };
+}
+// ---- 出版社地区识别（按名称关键词映射，覆盖欧美/日本/韩国/国内主流出版社） ----
+const REGION_RULES = {
+  western: [
+    // 欧美知名出版社（学术出版集团）
+    "elsevier","springer","nature","wiley","oxford","cambridge","sage","taylor & francis","informa","ieee","acm","apa","acs","royal society","annual reviews","emerald","palgrave","macmillan","de gruyter","brill","karger","lippincott","bmj","jama","aaas","plos","mdpi","frontiers","hindawi","iop","institute of physics","amercan physical","aps physics","wolters kluwer","thieme","karger","pearson","prentice","mcgraw","cengage","houghton","hachette","harpercollins","random house","penguin","simon & schuster","university press","mit press","stanford university","harvard university","yale university","john wiley","johns hopkins","duke university","university of chicago","cornell university","princeton university","university of california","w. w. norton","reed-elsevier","lexisnexis","westlaw","european","american","british","washington","london","new york","paris","berlin","amsterdam","usa","u.s.","united states"
+  ],
+  japan: [
+    "springer japan","tokyo","japan","japanese","kyoto","osaka","rikkyo","waseda","keio","nagoya","hokkaido","tohoku","kyushu","hitotsubashi","kobe","tsukuba","jst","j-stage","japan medical","japanese society","nihon","nihon","shogakukan","kadokawa","kobunsha","kodansha","shueisha","iwanami","japan academic","japanese association","japanese pharmacological","tohoku university","the japan","日本","东京","京都","大阪","岩波","講談社","小学馆","角川","日本医学会"
+  ],
+  korea: [
+    "korea","korean","seoul","busan","daegu","incheon","gwangju","daejeon","yonsei","korea university","seoul national","kaist","postech","hanyang","sungkyunkwan","ewha","kyung","publisher co., ltd","한국","서울","대한","한국어"
+  ],
+  china: [
+    // 国内出版社（科学出版社/高等教育出版社/清华/北大/人民/电子工业等）
+    "springer nature china","tsinghua","peking university","fudan","zhejiang university","nanjing university","shanghai jiao tong","sun yat-sen","xiamen university","wuhan university","sichuan university","jilin university","shandong university","renmin university","beijing normal","chinese academy","science press","china science","science china","china higher education","higher education press","people's education","electron","posts & telecom","machinery industry","chemical industry","petroleum industry","metallurgical","textile","light industry","aviation","aerospace","defense industry","atomic energy","national defense","中国","人民","科学出版","高等教育","清华","北京","复旦","浙江大学","上海交通","中山大学","南京大学","武汉大学","四川大学","吉林大学","山东大学","电子工业","机械工业","化学工业","人民邮电","国防工业","中国社会科学","商务印书馆","中华书局","三联书店","人民文学","上海人民","江苏人民","浙江人民","人民出版社","中国农业","中国林业","中国水利","中国电力","中国建筑","中国铁道","中国标准","中国劳动","社会科学文献","国家图书馆","科学通报","中国科学"
+  ]
+};
+function matchRegion(name, region){
+  if(!name) return false;
+  const n = name.toLowerCase();
+  if(region==="western"){
+    // 欧美：先排除亚洲出版社（日本/韩国/国内关键词命中则不属于欧美）
+    const asia = REGION_RULES.japan.concat(REGION_RULES.korea, REGION_RULES.china);
+    if(asia.some(k=> n.includes(k.toLowerCase()))) return false;
+    return REGION_RULES.western.some(k=> n.includes(k.toLowerCase()));
+  }
+  const rules = REGION_RULES[region];
+  if(!rules) return true;
+  return rules.some(k=> n.includes(k.toLowerCase()));
+}
+
+// ---- Crossref 条目标准化 ----
+function normalizeCR(item){
+  const doi = doiOf(item);
+  return {
+    doi, title:(item.title&&item.title[0])||"（无标题）",
+    authors:item.author||[], issued:item.issued, type:item.type||"other",
+    journal:journalOf(item), publisher:item.publisher||"",
+    volume:item.volume||"", issue:item.issue||"", page:item.page||"",
+    articleNumber:item["article-number"]||"",
+    abstract:item.abstract||"", url:item.URL||(doi?doiUrl(doi):""),
+    // 真实原文平台页面（出版社官网）优先：resource.primary > link[0] > DOI 解析
+    platform: item.resource?.primary?.URL || (item.link && item.link[0]?.URL) || item.URL || (doi?doiUrl(doi):""),
+    cited:item["is-referenced-by-count"]||0, lang:"", degree:"", source:"crossref"
+  };
+}
+// ---- 构建检索参数 ----
+function buildCrossrefParams(){
+  const p = new URLSearchParams();
+  const q = qInput.value.trim();
+  const ftype = state.field || "all";   // all | title | author | doi | publisher
+  // 高级检索条件优先（结构化 AND 组合）
+  if(state.advConditions && state.advConditions.length){
+    const parts = [];
+    state.advConditions.forEach(c=>{
+      const v = c.val;
+      if(c.field==="title") p.set("query.title", v);
+      else if(c.field==="author") p.set("query.author", v);
+      else if(c.field==="doi") p.set("query.bibliographic", v);
+      else if(c.field==="publisher") p.set("query.container-title", v);
+      else parts.push(v);
+    });
+    if(parts.length) p.set("query.bibliographic", parts.join(" "));
+  } else if(q){
+    if(ftype==="title") p.set("query.title", q);
+    else if(ftype==="author") p.set("query.author", q);
+    else if(ftype==="doi") p.set("query.bibliographic", q);
+    else if(ftype==="publisher") p.set("query.container-title", q);
+    else p.set("query.bibliographic", q);
+  }
+  p.set("rows", ROWS);
+  p.set("select", "DOI,title,author,issued,publisher,type,container-title,volume,issue,page,article-number,abstract,URL,resource,link,license,is-referenced-by-count");
+  p.set("mailto", "user@example.com");
+  const sortPublished = state.sort==="published";
+  if(sortPublished){
+    // published 排序与 cursor 不兼容，改用 offset 分页
+    p.set("offset", ((state.page-1)*ROWS));
+  } else {
+    p.set("cursor", state.crCursor || "*");
+  }
+  const flt = [];
+  // 门户导航类型过滤（期刊/图书/会议/数据集/预印本）
+  const effectiveType = facetSelections.type || navType;
+  if(effectiveType) flt.push("type:"+effectiveType);
+  if(state.source==="literature" && state.degree==="dissertation") flt.push("type:dissertation");
+  // DOI 精确检索：直接查 works/{doi}
+  if(ftype==="doi" && q){
+    const cleanDoi = q.trim().replace(/^https?:\/\/doi\.org\//i,"").replace(/^doi:\s*/i,"");
+    if(/^10\.\d{4,9}\/\S+/.test(cleanDoi)) p.set("filter", "doi:"+cleanDoi);
+  }
+  const y1 = $("fYearFrom").value.trim(), y2 = $("fYearTo").value.trim();
+  if(y1) flt.push("from-pub-date:"+y1+"-01-01");
+  if(y2) flt.push("until-pub-date:"+y2+"-12-31");
+  if(flt.length) p.set("filter", flt.join(","));
+  p.set("sort", SORT_MAP[state.sort]||"relevance");
+  if(state.sort==="published") p.set("order", "desc");
+  return p;
+}
+function buildOpenAlexParams(){
+  const p = new URLSearchParams();
+  const q = qInput.value.trim();
+  if(q) p.set("search", q);
+  p.set("per-page", ROWS);
+  p.set("mailto", "user@example.com");
+  p.set("page", state.page);
+  const flt = [];
+  // 学科导航：按国际学科领域过滤（OpenAlex field）
+  if(navField) flt.push("primary_topic.field.id:"+navField);
+  // 资源导航类型映射到 OpenAlex 类型
+  const oaType = {dissertation:"dissertation", book:"book", "journal-article":"article", "proceedings-article":"article", dataset:"dataset", preprint:"preprint"}[navType];
+  if(oaType) flt.push("type:"+oaType);
+  else if(state.source==="dissertations") flt.push("type:dissertation");
+  if(flt.length===0) flt.push("type:article");
+  const y1 = $("fYearFrom").value.trim(), y2 = $("fYearTo").value.trim();
+  if(y1) flt.push("from_publication_date:"+y1+"-01-01");
+  if(y2) flt.push("to_publication_date:"+y2+"-12-31");
+  p.set("filter", flt.join(","));
+  if(state.sort==="cited") p.set("sort", "cited_by_count:desc");
+  else if(state.sort==="published") p.set("sort", "publication_date:desc");
+  return p;
+}
+
+async function search(page){
+  state.q = qInput.value.trim();
+  state.field = $("fField").value;
+  state.source = $("fSource").value;
+  state.degree = $("fDegree").value;
+  state.yearFrom = $("fYearFrom").value.trim();
+  state.yearTo = $("fYearTo").value.trim();
+  state.sort = $("fSort").value;
+  state.region = $("fRegion") ? $("fRegion").value : "";
+  if(page===1){ state.cursor="*"; state.prevCursor=null; state.crCursor="*"; state.crPrev=null; state.page=1; }
+  state.loading = true;
+  renderSkeletons();
+  pagination.style.display = "none";
+  const started = Date.now();
+  try{
+    // 学科导航激活时用 OpenAlex（支持学科过滤）；资源导航类型照常
+    const useOA = state.source==="dissertations" || state.source==="all" || !!navField;
+    const useCR = state.source==="literature" || (state.source==="all" && !navField);
+    let oaRes = null, crRes = null, oaLimited = false;
+    const jobs = [];
+    if(useOA) jobs.push(fetch(OPENALEX_API + "?" + buildOpenAlexParams().toString(), { headers:{"User-Agent":UA} }).then(async r=>{
+      if(r.status===429){ oaLimited = true; return null; }
+      return r.ok ? r.json() : null;
+    }).catch(()=>null));
+    if(useCR) jobs.push(fetch(CROSSREF_API + "?" + buildCrossrefParams().toString(), { headers:{"User-Agent":UA} }).then(r=>r.ok?r.json():null).catch(()=>null));
+    const settled = await Promise.all(jobs);
+    if(useOA) oaRes = settled.shift();
+    if(useCR) crRes = settled.shift();
+    // dissertations 模式：OA 限流时自动补 Crossref 学位论文兜底
+    if(state.source==="dissertations" && oaLimited && !crRes){
+      const p = new URLSearchParams();
+      p.set("query.bibliographic", qInput.value.trim());
+      p.set("rows", ROWS);
+      p.set("select", "DOI,title,author,issued,publisher,type,container-title,abstract,URL,resource,link,is-referenced-by-count");
+      p.set("mailto", "user@example.com");
+      p.set("cursor", state.crCursor || "*");
+      p.set("filter", "type:dissertation");
+      crRes = await fetch(CROSSREF_API + "?" + p.toString(), { headers:{"User-Agent":UA} }).then(r=>r.ok?r.json():null).catch(()=>null);
+      state.oaFallback = true;
+    } else {
+      state.oaFallback = false;
+    }
+
+    let items = [], total = 0;
+    state.sourceTag = state.source;
+    if(oaRes){
+      const oaItems = (oaRes.results||[]).map(normalizeOA);
+      items = items.concat(oaItems.map(x=>({...x, _src:"oa"})));
+      total += oaRes.meta?.count || 0;
+    }
+    if(crRes){
+      const crItems = (crRes.message?.items||[]).map(normalizeCR);
+      const crTag = state.oaFallback ? "cr-diss" : "cr";
+      items = items.concat(crItems.map(x=>({...x, _src:crTag})));
+      total += crRes.message?.["total-results"] || 0;
+      // 游标管理（仅 relevance/cited 排序使用 cursor；published 用 offset）
+      if(state.sort !== "published"){
+        if(page > state.page){
+          state.crPrev = state.crCursor;
+          state.crCursor = crRes.message?.["next-cursor"] || null;
+        } else if(page < state.page){
+          state.crCursor = state.crPrev;
+          state.crPrev = null;
+        } else {
+          state.crCursor = crRes.message?.["next-cursor"] || null;
+        }
+        state.cursor = state.crCursor;
+      }
+    }
+    // 降级提示：全球学位论文库限流
+    if(oaLimited){
+      toast("⚠️ 全球学位论文库暂时限流，可稍后重试或切换数据源");
+    }
+    // 学位类型：OpenAlex 无分级字段，按标题特征做优先排序（非过滤）
+    if(state.degree){
+      items.sort((a,b)=>{
+        const ao = a._src==="oa" && a.degree===state.degree ? 0 : 1;
+        const bo = b._src==="oa" && b.degree===state.degree ? 0 : 1;
+        return ao - bo;
+      });
+    }
+    // 门户导航类型过滤（Crossref 端已过滤，OpenAlex 前端兜底）
+    if(navType && items.some(x=>x._src==="oa")){
+      items = items.filter(x=> x._src!=="oa" || x.type===navType);
+    }
+    // 期刊分面过滤
+    if(facetSelections.journal && items.length){
+      items = items.filter(x=> x.journal===facetSelections.journal || x.journal.includes(facetSelections.journal));
+    }
+    // 语言过滤（仅高级检索设置时）
+    if(state.langFilter){
+      items = items.filter(x=> {
+        if(x.lang) return x.lang===state.langFilter;
+        return true; // 无语言信息的保留
+      });
+    }
+    // 出版社地区过滤（前端按出版社+期刊名关键词映射，兼容所有数据源）
+    if(state.region){
+      items = items.filter(x=> matchRegion((x.publisher||"")+" "+(x.journal||""), state.region));
+    }
+    state.results = items;
+    state.total = total;
+    state.page = page;
+    renderList();
+    renderFacets();
+    renderBatchBar();
+    renderMeta(started);
+    if(state.results.length){
+      selectResult(0);
+    } else {
+      renderEmpty("未找到匹配文献","换个关键词或放宽筛选条件试试");
+      detailPanel.innerHTML = placeholderHTML();
+    }
+    pagination.style.display = (state.results.length ? "flex" : "none");
+  }catch(err){
+    console.error(err);
+    state.results = [];
+    state.total = 0;
+    renderError(err.message);
+    renderMeta(started);
+    pagination.style.display = "none";
+  }finally{
+    state.loading = false;
+    renderPagination();
+  }
+}
+
+/* ================= 渲染：列表 ================= */
+function renderSkeletons(){
+  resultList.innerHTML = Array.from({length:5}, ()=>
+    `<div class="skeleton"><div class="sk t"></div><div class="sk s"></div><div class="sk m"></div></div>`).join("");
+}
+function renderEmpty(title, sub){
+  resultList.innerHTML = `<div class="state-box"><div class="big">🔎</div><h4>${esc(title)}</h4><p>${esc(sub)}</p></div>`;
+}
+function renderError(msg){
+  resultList.innerHTML = `<div class="state-box"><div class="big">⚠️</div><h4>出错了</h4><p>${esc(msg)}</p><p style="margin-top:12px;font-size:13px">请检查网络连接后重试</p></div>`;
+}
+function renderList(){
+  if(!state.results.length) return;
+  resultList.innerHTML = state.results.map((it, i)=>{
+    const y = yearOf(it.issued);
+    const j = it.journal;
+    const fav = isFav(it.doi);
+    const srcBadge = it._src==="oa" ? `<span class="src-oa" title="来源：全球学位论文库(OpenAlex)">🎓 学位论文</span>`
+      : it._src==="cr-diss" ? `<span class="src-oa" title="来源：Crossref 学位论文（限流兜底）">🎓 学位论文</span>`
+      : `<span class="src-cr" title="来源：Crossref 学术文献库">📄 学术文献</span>`;
+    const degLabel = it.degree ? (it.degree==="doctoral"?"博士":it.degree==="masters"?"硕士":it.degree==="bachelors"?"本科":it.degree) : "";
+    const volIss = (it.volume||it.issue) ? `${it.volume?`Vol.${it.volume}`:""}${it.volume&&it.issue?" · ":""}${it.issue?`No.${it.issue}`:""}` : "";
+    const pages = it.page ? `pp.${it.page}` : "";
+    const isSel = selectedDois.has(it.doi);
+    return `<article class="paper-card${state.active&&state.active.doi===it.doi?" active":""}${isSel?" selected":""}" data-idx="${i}" tabindex="0" role="button" aria-label="查看详情：${esc(it.title)}">
+      <input type="checkbox" class="sel-check" data-sel="${esc(it.doi)}" ${isSel?"checked":""} aria-label="选择文献" title="选择">
+      <button class="fav ${fav?"on":""}" data-fav="${esc(it.doi)}" aria-label="${fav?"取消收藏":"收藏"}">${fav?"★":"☆"}</button>
+      ${srcBadge}
+      <span class="type-badge">${esc(typeLabel(it.type))}</span>
+      <h3>${esc(it.title)}</h3>
+      <div class="authors">${esc(fmtAuthors(it.authors,4))}</div>
+      <div class="meta-row">
+        ${y?`<span class="year">${esc(y)}</span>`:""}
+        ${degLabel?`<span class="degree-tag">${esc(degLabel)}</span>`:""}
+        ${j?`<span class="journal">${esc(j)}</span>`:""}
+        ${volIss?`<span class="vol-iss">${esc(volIss)}</span>`:""}
+        ${pages?`<span class="pages">${esc(pages)}</span>`:""}
+        ${it.cited?`<span title="被引次数">📊 ${it.cited}</span>`:""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+/* ================= 渲染：详情 ================= */
+function placeholderHTML(){
+  return `<div class="placeholder"><div class="big">📄</div><p>点击左侧文献卡片查看详细信息<br><br>支持收藏、导出 BibTeX / CSV</p></div>`;
+}
+function selectResult(idx){
+  const it = state.results[idx];
+  if(!it) return;
+  state.active = it;
+  document.querySelectorAll(".paper-card").forEach(el=>{
+    el.classList.toggle("active", +el.dataset.idx === idx);
+  });
+  renderDetail(it);
+}
+function renderDetail(it){
+  const y = yearOf(it.issued);
+  const authors = it.authors && it.authors.length ? fmtAuthors(it.authors, 10) : "";
+  const abs = abstractText(it);
+  const fav = isFav(it.doi);
+  const kw = it.keywords || [];
+  const degLabel = it.degree ? (it.degree==="doctoral"?"博士":it.degree==="masters"?"硕士":it.degree==="bachelors"?"本科":it.degree) : "";
+  const srcTag = it._src==="oa" ? "全球学位论文库(OpenAlex)" : (it._src==="cr-diss" ? "学位论文(Crossref兜底)" : "学术文献库(Crossref)");
+  const langLabel = it.lang ? (it.lang==="zh"?"中文":it.lang==="en"?"英文":it.lang.toUpperCase()) : "";
+  // 卷/期/页码
+  const volIssParts = [];
+  if(it.volume) volIssParts.push(`第 ${esc(it.volume)} 卷`);
+  if(it.issue) volIssParts.push(`第 ${esc(it.issue)} 期`);
+  const volIss = volIssParts.join(" · ");
+  const pages = it.page ? `页码：${esc(it.page)}` : "";
+  // 原文平台链接（优先出版社真实页面，兜底 DOI 解析）
+  const platformLink = it.platform || it.url || (it.doi ? doiUrl(it.doi) : "");
+  const platformName = it.publisher || it.journal || "原文平台";
+  detailPanel.innerHTML = `
+    <span class="d-type">${esc(typeLabel(it.type))}</span>
+    ${it._src?`<span class="d-src">${esc(srcTag)}</span>`:""}
+    <h2>${esc(it.title)}</h2>
+    ${authors?`<div class="d-authors">${esc(authors)}</div>`:""}
+    ${it.journal?`<div class="d-journal">🏛 ${esc(it.journal)}${it.publisher&&it.publisher!==it.journal?` · ${esc(it.publisher)}`:""}</div>`:""}
+    <div class="d-badges">
+      ${y?`<span class="d-year">📅 ${esc(y)}</span>`:""}
+      ${volIss?`<span class="d-vol">📖 ${volIss}</span>`:""}
+      ${pages?`<span class="d-pages">📑 ${pages}</span>`:""}
+      ${degLabel?`<span class="d-degree">🎓 ${esc(degLabel)}</span>`:""}
+      ${langLabel?`<span class="d-lang">🌐 ${esc(langLabel)}</span>`:""}
+    </div>
+    <div class="d-actions">
+      <button class="btn primary" id="dFav">${fav?"★ 已收藏":"☆ 收藏"}</button>
+      <button class="btn" id="dBib">导出 BibTeX</button>
+      <button class="btn" id="dCsv">导出 CSV</button>
+      ${platformLink?`<a class="btn" href="${esc(platformLink)}" target="_blank" rel="noopener" title="跳转到出版社/数据库真实页面">🔗 原文平台</a>`:""}
+      ${it.doi?`<a class="btn" href="${esc(doiUrl(it.doi))}" target="_blank" rel="noopener" title="DOI 官方解析">📌 DOI</a>`:""}
+    </div>
+    ${abs?`<div class="d-abstract"><b>摘要</b><br>${esc(abs)}</div>`:""}
+    <div class="d-doi">
+      ${it.doi?`DOI：<a href="${esc(doiUrl(it.doi))}" target="_blank" rel="noopener">${esc(it.doi)}</a>`:"DOI：—"}
+      ${it.publisher?` · 出版社：${esc(it.publisher)}`:""}
+    </div>`;
+  const dFav = $("dFav");
+  if(dFav) dFav.onclick = ()=>{ fav ? removeFav(it.doi) : addFav(it); renderDetail(it); renderList(); };
+  const dBib = $("dBib"); if(dBib) dBib.onclick = ()=>exportBib([it]);
+  const dCsv = $("dCsv"); if(dCsv) dCsv.onclick = ()=>exportCsv([it]);
+}
+
+/* ================= 元信息 & 分页 ================= */
+function renderMeta(started){
+  const el = $("searchMeta");
+  el.style.display = "flex";
+  $("metaCount").textContent = `找到 ${state.total.toLocaleString()} 条结果`;
+  $("metaTime").textContent = `耗时 ${((Date.now()-started)/1000).toFixed(1)}s`;
+  const srcName = state.source==="dissertations"?"（全球硕博论文）":state.source==="literature"?"（学术文献）":"（硕博论文+文献）";
+  const degHint = state.degree ? ` · ${$("fDegree").selectedOptions[0].textContent}优先展示（数据源未分级）` : "";
+  $("metaHint").textContent = state.results.length ? `第 ${state.page} 页 · 每页 ${ROWS} 条 · ${srcName}${degHint}` : srcName+degHint;
+}
+function renderPagination(){
+  $("pageInfo").textContent = `第 ${state.page} 页`;
+  $("btnPrev").disabled = state.page<=1;
+  const useOA = state.source==="dissertations" || state.source==="all";
+  const useCR = state.source==="literature" || state.source==="all";
+  const crHasNext = state.sort==="published" ? (state.page*ROWS < state.total) : !!state.crCursor;
+  const hasNext = (useOA && state.page<MAX_PAGES) || (useCR && crHasNext);
+  $("btnNext").disabled = !hasNext || state.page>=MAX_PAGES || state.loading;
+}
+$("btnPrev").onclick = async ()=>{
+  if(state.page<=1) return;
+  if(state.crPrev){ state.crCursor = state.crPrev; state.crPrev = null; }
+  await search(state.page-1);
+};
+$("btnNext").onclick = async ()=> search(state.page+1);
+
+/* ================= 收藏抽屉 ================= */
+function renderFavBadge(){
+  const b = $("favBadge");
+  b.style.display = favorites.length ? "flex" : "none";
+  b.textContent = favorites.length;
+}
+function renderDrawer(){
+  const body = $("drawerBody");
+  $("favCount").textContent = `（${favorites.length}）`;
+  if(!favorites.length){
+    body.innerHTML = `<div class="empty">暂无收藏<br><br>在文献卡片上点击 ☆ 即可收藏</div>`;
+    return;
+  }
+  body.innerHTML = favorites.map(f=>{
+    const y = yearOf(f.issued);
+    const j = f.journal;
+    return `<div class="fav-item">
+      <div class="info">
+        <h4 data-doi="${esc(f.doi)}">${esc(f.title)}</h4>
+        <div class="sub">${esc(fmtAuthors(f.authors,3))}${j?" · "+esc(j):""}${y?" · "+esc(y):""}</div>
+      </div>
+      <button class="rm" data-rm="${esc(f.doi)}" aria-label="移除">🗑</button>
+    </div>`;
+  }).join("");
+  body.querySelectorAll("h4[data-doi]").forEach(el=>{
+    el.onclick = ()=>{ const f=favorites.find(x=>x.doi===el.dataset.doi); if(f){ $("q").value=""; closeDrawer(); showSingle(f); } };
+  });
+  body.querySelectorAll(".rm").forEach(el=>{
+    el.onclick = ()=>removeFav(el.dataset.rm);
+  });
+}
+function showSingle(item){
+  // 在详情面板中单独展示一条收藏
+  renderDetail(item);
+  // 滚动到详情
+  detailPanel.scrollIntoView({behavior:"smooth", block:"start"});
+}
+function openDrawer(){ $("drawerMask").classList.add("show"); $("drawer").classList.add("show"); renderDrawer(); }
+function closeDrawer(){ $("drawerMask").classList.remove("show"); $("drawer").classList.remove("show"); }
+$("btnFav").onclick = openDrawer;
+$("btnCloseDrawer").onclick = closeDrawer;
+$("drawerMask").onclick = closeDrawer;
+$("btnClearFav").onclick = ()=>{ if(favorites.length && confirm("确定清空全部收藏？")){ favorites=[]; saveFav(); renderFavBadge(); renderDrawer(); toast("已清空收藏"); } };
+
+/* ================= 导出 ================= */
+function bibEntry(it){
+  const doi = it.doi, y = yearOf(it.issued);
+  const t = (it.title||"").replace(/[{}]/g,"").trim();
+  const j = (it.journal||it.publisher||"").replace(/[{}]/g,"").trim();
+  let typeKey = "misc";
+  if(it.type==="journal-article") typeKey = "article";
+  else if(it.type==="book"||it.type==="monograph") typeKey = "book";
+  else if(it.type==="dissertation"||it._src==="oa") typeKey = (it.degree==="masters"||it.degree==="bachelors") ? "mastersthesis" : "phdthesis";
+  const auth = (it.authors||[]).map(a=>`${a.family||""}, ${a.given||""}`.replace(/,\s*$/,"")).join(" and ") || "Anonymous";
+  const school = it.journal || it.publisher || "";
+  const lines = [
+    `@${typeKey}{${doi||"unknown"},`,
+    `  title = {${t}},`,
+    `  author = {${auth}},`,
+    y ? `  year = {${y}},` : "",
+    (typeKey==="phdthesis"||typeKey==="mastersthesis") ? (school ? `  school = {${school}},` : "") : (j ? `  journal = {${j}},` : ""),
+    it.volume ? `  volume = {${it.volume}},` : "",
+    it.issue ? `  number = {${it.issue}},` : "",
+    it.page ? `  pages = {${it.page}},` : "",
+    it.publisher ? `  publisher = {${it.publisher}},` : "",
+    doi ? `  doi = {${doi}},` : "",
+    `}`
+  ];
+  return lines.filter(l=>l!==null && l.trim()!=="").join("\n");
+}
+function downloadFile(name, content, mime){
+  const blob = new Blob([content], {type:mime+";charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 200);
+}
+function exportBib(items){
+  if(!items.length) return toast("没有可导出的文献");
+  downloadFile("literature.bib", items.map(bibEntry).join("\n\n"), "application/x-bibtex");
+  toast("已导出 "+items.length+" 条 BibTeX");
+}
+function exportCsv(items){
+  if(!items.length) return toast("没有可导出的文献");
+  const escCsv = s=>{ s=String(s||""); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const head = ["Title","Authors","Year","Type","Journal","Volume","Issue","Pages","Publisher","DOI","URL","Cited"];
+  const rows = items.map(it=>[
+    escCsv(it.title), escCsv(fmtAuthors(it.authors,10)), escCsv(yearOf(it.issued)),
+    escCsv(typeLabel(it.type)), escCsv(it.journal), escCsv(it.volume||""), escCsv(it.issue||""), escCsv(it.page||""),
+    escCsv(it.publisher||""), escCsv(it.doi), escCsv(it.url), it.cited
+  ].join(","));
+  downloadFile("literature.csv", "\ufeff"+[head.join(","), ...rows].join("\n"), "text/csv");
+  toast("已导出 "+items.length+" 条 CSV");
+}
+$("btnExportBib").onclick = ()=>exportBib(favorites);
+$("btnExportCsv").onclick = ()=>exportCsv(favorites);
+
+/* ================= 门户导航 ================= */
+const NAV_MAP = {
+  literature: {source:"literature", type:""},
+  dissertations: {source:"dissertations", type:""},
+  journal: {source:"literature", type:"journal-article"},
+  book: {source:"literature", type:"book"},
+  conference: {source:"literature", type:"proceedings-article"},
+  dataset: {source:"literature", type:"dataset"},
+  preprint: {source:"literature", type:"preprint"}
+};
+let navType = "";
+/* 学科导航：国际学科领域（OpenAlex field.id，对标 Scopus 26 学科） */
+let navField = "";
+document.querySelectorAll(".field-item").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".field-item").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    navField = btn.dataset.field || "";
+    // 学科检索走 OpenAlex（支持 primary_topic.field.id 过滤）
+    $("fSource").value = navField ? "all" : state.source || "literature";
+    search(1);
+  });
+});
+document.querySelectorAll(".nav-item").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const cfg = NAV_MAP[btn.dataset.nav];
+    $("fSource").value = cfg.source;
+    navType = cfg.type;
+    // 同步高级检索类型下拉
+    if($("advType")) $("advType").value = cfg.type;
+    // 清除分面类型选择
+    facetSelections.type = "";
+    renderFacets();
+    search(1);
+  });
+});
+
+/* ================= 高级检索 ================= */
+let advConditions = [];
+function collectAdvConditions(){
+  const rows = document.querySelectorAll(".adv-panel .adv-row:not(:has(.adv-add))");
+  const conds = [];
+  rows.forEach(row=>{
+    const field = row.querySelector(".adv-field")?.value || "all";
+    const val = (row.querySelector(".adv-val")?.value || "").trim();
+    if(val) conds.push({field, val});
+  });
+  return conds;
+}
+function renderAdvRows(){
+  const panel = $("advPanel");
+  // 重建条件行（保留第一行固定 + 动态行）
+  const rows = panel.querySelectorAll(".adv-row:not(:has(.adv-add))");
+  rows.forEach((row, i)=>{
+    if(i===0){
+      // 第一行不显示删除
+      row.querySelector(".adv-del")?.remove();
+    } else {
+      const del = row.querySelector(".adv-del");
+      if(del) del.onclick = ()=> row.remove();
+    }
+  });
+}
+$("btnAdvToggle").onclick = ()=>{
+  $("advPanel").classList.toggle("show");
+  $("btnAdvToggle").textContent = $("advPanel").classList.contains("show") ? "收起高级检索" : "⚙ 高级检索";
+};
+$("btnAdvAdd").onclick = ()=>{
+  const panel = $("advPanel");
+  const row = document.createElement("div");
+  row.className = "adv-row";
+  row.innerHTML = `
+    <span class="adv-logic">AND</span>
+    <select class="adv-field">
+      <option value="all">全部字段</option>
+      <option value="title">标题</option>
+      <option value="author">作者</option>
+      <option value="doi">DOI</option>
+      <option value="publisher">期刊/出版社</option>
+      <option value="abstract">摘要</option>
+    </select>
+    <input class="adv-val" type="text" placeholder="输入检索词…">
+    <button class="adv-del" title="删除条件">✕</button>`;
+  row.querySelector(".adv-del").onclick = ()=> row.remove();
+  $("btnAdvAdd").closest(".adv-row").before(row);
+};
+$("btnAdvSearch").onclick = ()=>{
+  state.advConditions = collectAdvConditions();
+  // 显示查询摘要到主搜索框（仅展示用）
+  const qs = state.advConditions.map(c=>{
+    const fieldName = c.field==="title"?"标题":c.field==="author"?"作者":c.field==="doi"?"DOI":c.field==="publisher"?"期刊":"全部";
+    return `${fieldName}:${c.val}`;
+  });
+  qInput.value = qs.join(" AND ");
+  $("fField").value = "all";
+  // 类型/语种过滤
+  const t = $("advType").value;
+  const lang = $("advLang").value;
+  navType = t;
+  if($("fSource")) $("fSource").value = "literature";
+  state.langFilter = lang;
+  facetSelections.type = t;
+  renderFacets();
+  search(1);
+};
+$("btnAdvReset").onclick = ()=>{
+  document.querySelectorAll(".adv-val").forEach(i=> i.value = "");
+  $("advType").value = "";
+  $("advLang").value = "";
+  state.langFilter = "";
+  state.advConditions = [];
+  qInput.value = "";
+  navType = "";
+  facetSelections.type = "";
+  renderFacets();
+  search(1);
+};
+
+/* ================= 分面筛选 ================= */
+let facetSelections = { type:"", journal:"" };
+let facetData = { types:{}, journals:{} };
+function buildFacetData(){
+  // 从当前结果统计分面
+  const types = {}, journals = {};
+  state.results.forEach(it=>{
+    const t = typeLabel(it.type);
+    types[t] = (types[t]||0) + 1;
+    const j = it.journal || "未知来源";
+    if(j && j!=="未知来源") journals[j] = (journals[j]||0) + 1;
+  });
+  facetData.types = Object.entries(types).sort((a,b)=>b[1]-a[1]);
+  facetData.journals = Object.entries(journals).sort((a,b)=>b[1]-a[1]).slice(0,8);
+}
+function renderFacets(){
+  buildFacetData();
+  // 类型分面
+  const typeList = $("facetTypeList");
+  if(facetData.types.length){
+    typeList.innerHTML = facetData.types.map(([name,count])=>{
+      const key = Object.keys(TYPE_LABEL).find(k=>TYPE_LABEL[k]===name) || name;
+      const on = facetSelections.type===key ? "on" : "";
+      return `<label class="facet-item ${on}">
+        <input type="checkbox" data-type="${esc(key)}" ${on?"checked":""}> ${esc(name)}
+        <span class="f-count">${count}</span>
+      </label>`;
+    }).join("");
+    typeList.querySelectorAll("input[data-type]").forEach(cb=>{
+      cb.onchange = ()=>{
+        facetSelections.type = cb.checked ? cb.dataset.type : "";
+        renderFacets();
+        navType = facetSelections.type;
+        if($("advType")) $("advType").value = facetSelections.type;
+        search(1);
+      };
+    });
+  } else {
+    typeList.innerHTML = `<div style="font-size:12px;color:var(--muted)">暂无数据</div>`;
+  }
+  // 期刊分面
+  const jList = $("facetJournalList");
+  if(facetData.journals.length){
+    jList.innerHTML = facetData.journals.map(([name,count])=>{
+      const on = facetSelections.journal===name ? "on" : "";
+      return `<label class="facet-item ${on}">
+        <input type="checkbox" data-journal="${esc(name)}" ${on?"checked":""}> ${esc(name.length>22?name.slice(0,22)+"…":name)}
+        <span class="f-count">${count}</span>
+      </label>`;
+    }).join("");
+    jList.querySelectorAll("input[data-journal]").forEach(cb=>{
+      cb.onchange = ()=>{
+        facetSelections.journal = cb.checked ? cb.dataset.journal : "";
+        renderFacets();
+        search(1);
+      };
+    });
+  } else {
+    jList.innerHTML = `<div style="font-size:12px;color:var(--muted)">暂无数据</div>`;
+  }
+}
+$("facetTypeClear").onclick = ()=>{
+  facetSelections.type = ""; navType = ""; if($("advType")) $("advType").value = "";
+  renderFacets(); search(1);
+};
+$("facetJournalClear").onclick = ()=>{
+  facetSelections.journal = ""; renderFacets(); search(1);
+};
+$("facetYearClear").onclick = ()=>{
+  $("facetYearFrom").value = ""; $("facetYearTo").value = "";
+  $("fYearFrom").value = ""; $("fYearTo").value = "";
+  search(1);
+};
+$("facetYearApply").onclick = ()=>{
+  $("fYearFrom").value = $("facetYearFrom").value;
+  $("fYearTo").value = $("facetYearTo").value;
+  search(1);
+};
+
+/* ================= 批量选择 ================= */
+let selectedDois = new Set();
+function renderBatchBar(){
+  const bar = $("batchBar");
+  if(!state.results.length){ bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  $("selCount").textContent = `已选 ${selectedDois.size} 篇`;
+  const allChecked = state.results.length>0 && state.results.every(it=>selectedDois.has(it.doi));
+  $("selAll").checked = allChecked;
+}
+$("selAll").onchange = (e)=>{
+  const checked = e.target.checked;
+  state.results.forEach(it=>{
+    if(checked) selectedDois.add(it.doi); else selectedDois.delete(it.doi);
+  });
+  renderList(); renderBatchBar();
+};
+$("btnBatchFav").onclick = ()=>{
+  const items = state.results.filter(it=>selectedDois.has(it.doi));
+  if(!items.length) return toast("请先勾选文献");
+  items.forEach(it=>{ if(!isFav(it.doi)) favorites.unshift(it); });
+  saveFav(); renderFavBadge(); renderDrawer();
+  toast(`已收藏 ${items.length} 篇 ⭐`);
+};
+$("btnBatchBib").onclick = ()=>{
+  const items = state.results.filter(it=>selectedDois.has(it.doi));
+  if(!items.length) return toast("请先勾选文献");
+  downloadFile("literature.bib", items.map(bibEntry).join("\n\n"), "application/x-bibtex");
+  toast(`已导出 ${items.length} 条 BibTeX`);
+};
+$("btnBatchCite").onclick = ()=>{
+  const items = state.results.filter(it=>selectedDois.has(it.doi));
+  if(!items.length) return toast("请先勾选文献");
+  openCitePop(items);
+};
+
+/* ================= 引用格式 ================= */
+let citeItems = [];
+let citeFmt = "gb";
+function fmtCiteGB(it){
+  const y = yearOf(it.issued);
+  const authors = (it.authors||[]).map(a=>`${a.family||""}${a.given?" "+a.given:""}`).join(", ") || "佚名";
+  let head = `${authors}. ${it.title}[${it.type==="journal-article"?"J":it.type==="dissertation"?"D":it.type==="book"?"M":it.type==="proceedings-article"?"C":"文献"}]`;
+  if(it.journal) head += ` ${it.journal}`;
+  if(it.volume||it.issue) head += `, ${it.volume||""}${it.issue?"("+it.issue+")":""}`;
+  if(it.page) head += `: ${it.page}`;
+  head += `${y?", "+y:""}.`;
+  if(it.doi) head += ` DOI: ${it.doi}.`;
+  return head;
+}
+function fmtCiteAPA(it){
+  const y = yearOf(it.issued);
+  const authors = (it.authors||[]).map((a,i)=>(i===it.authors.length-1 && i>0 ? "& " : "") + (a.family||"") + (a.given?" "+a.given:"")).join(", ") || "Anonymous";
+  let head = `${authors} (${y||"n.d."}). ${it.title}`;
+  if(it.journal) head += `. ${it.journal}`;
+  if(it.volume) head += `, ${it.volume}`;
+  if(it.issue) head += `(${it.issue})`;
+  if(it.page) head += `, ${it.page}`;
+  head += `. ${it.publisher||""}`.trim();
+  if(it.doi) head += ` https://doi.org/${it.doi}`;
+  return head;
+}
+function fmtCiteMLA(it){
+  const y = yearOf(it.issued);
+  const authors = (it.authors||[]).map(a=>`${a.family||""}, ${a.given||""}`).join("; ") || "Anonymous";
+  let head = `${authors}. "${it.title}." `;
+  if(it.journal) head += `${it.journal}, `;
+  if(it.volume) head += `vol. ${it.volume}, `;
+  if(it.issue) head += `no. ${it.issue}, `;
+  if(y) head += `${y}, `;
+  if(it.page) head += `pp. ${it.page}`;
+  if(it.doi) head += `, doi:${it.doi}`;
+  head += ".";
+  return head;
+}
+function renderCite(){
+  const textEl = $("citeText");
+  const fmts = {gb:fmtCiteGB, apa:fmtCiteAPA, mla:fmtCiteMLA, bibtex:bibEntry};
+  textEl.textContent = citeItems.map(it=>fmts[citeFmt](it)).join("\n\n");
+}
+function openCitePop(items){
+  citeItems = items; citeFmt = "gb";
+  document.querySelectorAll(".cite-fmt-btn").forEach(b=>b.classList.toggle("on", b.dataset.fmt==="gb"));
+  renderCite();
+  $("citePop").classList.add("show");
+}
+function closeCitePop(){ $("citePop").classList.remove("show"); }
+document.querySelectorAll(".cite-fmt-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    citeFmt = btn.dataset.fmt;
+    document.querySelectorAll(".cite-fmt-btn").forEach(b=>b.classList.toggle("on", b.dataset.fmt===citeFmt));
+    renderCite();
+  };
+});
+$("citeClose").onclick = closeCitePop;
+$("citeClose2").onclick = closeCitePop;
+$("citePop").addEventListener("click", e=>{ if(e.target===e.currentTarget) closeCitePop(); });
+$("citeCopy").onclick = ()=>{
+  const text = $("citeText").textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>toast("已复制到剪贴板 📋")).catch(()=>toast("复制失败"));
+  } else {
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta); toast("已复制到剪贴板 📋");
+  }
+};
+
+/* ================= 事件 ================= */
+qInput.addEventListener("input", ()=> clearX.style.display = qInput.value ? "block" : "none");
+clearX.onclick = ()=>{ qInput.value=""; clearX.style.display="none"; qInput.focus(); };
+$("btnSearch").onclick = ()=> search(1);
+qInput.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); search(1); } });
+["fField","fSource","fDegree","fYearFrom","fYearTo","fSort"].forEach(id=>{
+  $(id).addEventListener("change", ()=> search(1));
+});
+// 中文数据库一键检索：带入当前关键词
+document.querySelectorAll(".cn-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const kw = encodeURIComponent(qInput.value.trim() || "");
+    if(!kw){ toast("请先输入检索关键词"); return; }
+    const url = btn.dataset.url.replace("KEYWORD", kw);
+    window.open(url, "_blank", "noopener");
+    toast("已在新窗口打开「"+btn.textContent+"」检索");
+  });
+});
+resultList.addEventListener("click", e=>{
+  const selCb = e.target.closest(".sel-check");
+  if(selCb){
+    e.stopPropagation();
+    const doi = selCb.dataset.sel;
+    if(selCb.checked) selectedDois.add(doi); else selectedDois.delete(doi);
+    renderList();
+    renderBatchBar();
+    return;
+  }
+  const favBtn = e.target.closest(".fav");
+  if(favBtn){
+    const doi = favBtn.dataset.fav;
+    const it = state.results.find(x=>x.doi===doi);
+    if(it) isFav(doi) ? removeFav(doi) : addFav(it);
+    renderList();
+    if(state.active && state.active.doi===doi) renderDetail(state.active);
+    return;
+  }
+  const card = e.target.closest(".paper-card");
+  if(card) selectResult(+card.dataset.idx);
+});
+resultList.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.classList.contains("paper-card")) selectResult(+e.target.dataset.idx);
+});
+
+/* ================= 关于 ================= */
+$("btnAbout").onclick = ()=>{
+  toast("📚 文献检索平台 · 全球硕博论文(OpenAlex) + 学术文献(Crossref) · 中文库(知网/万方/万方医学/维普)需机构账号权限");
+};
+
+/* ================= 初始化 ================= */
+renderFavBadge();
+renderDrawer();
+detailPanel.innerHTML = placeholderHTML();
+renderFacets();
+renderBatchBar();
+// 打开页面不留痕：强制清空搜索框，阻止浏览器恢复上次会话/后退缓存(bfcache)中的历史输入
+qInput.value = "";
+clearX.style.display = "none";
+// 页面从 bfcache 恢复时再次清空（Chrome 前进/后退会恢复输入框内容）
+window.addEventListener("pageshow", (e)=>{
+  if(e.persisted){ qInput.value=""; clearX.style.display="none"; }
+});
+// 展示欢迎引导（不自动搜索、不预填关键词）
+resultList.innerHTML = `<div class="placeholder"><div class="big">🔍</div><p>输入关键词 / 标题 / 作者 / DOI / 期刊名<br>或点击上方学科导航开始检索</p></div>`;
+</script>
+</body>
+</html>
